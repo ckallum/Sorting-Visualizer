@@ -2,7 +2,7 @@ import PySimpleGUI as sg
 import random
 
 GRAPH_SIZE = (700, 500)
-BAR_SPACING, BAR_WIDTH = 11, 10
+BAR_SPACING, BAR_WIDTH = 6, 5
 BARS = GRAPH_SIZE[0] // (BAR_WIDTH + 1)
 VALUES = GRAPH_SIZE[1]
 
@@ -25,29 +25,35 @@ def draw(graph, array):
                              bottom_right=(i * BAR_SPACING + BAR_WIDTH, 0), fill_color='#76506d')
 
 
-def merge(array, left, right):
+def merge(array, left, right, start):
     i = 0
     j = 0
     while j < len(right) and i < len(left):
         if left[i] < right[j]:
-            array[i + j] = left[i]
+            array[i + j + start] = left[i]
             i += 1
         else:
-            array[i + j] = right[j]
+            array[i + j + start] = right[j]
             j += 1
+        yield array
+
     while i < len(left):
-        array[i + j] = left[i]
+        array[i + j + start] = left[i]
+        i += 1
+        yield array
     while j < len(right):
-        array[i + j] = right[j]
+        array[i + j + start] = right[j]
+        j += 1
+        yield array
     yield array
 
 
-def mergesort(array):
-    if len(array) > 1:
-        middle = len(array) // 2
-        yield from mergesort(array[:middle])
-        yield from mergesort(array[middle:])
-        merge(array, array[:middle], array[middle:])
+def mergesort(array, split, start):
+    if len(split) > 1:
+        middle = len(split) // 2
+        yield from mergesort(array, split[:middle], start)
+        yield from mergesort(array, split[middle:], start+middle)
+        yield from merge(array, array[start:start+middle], array[start+middle:start+len(split)], start)
     yield array
 
 
@@ -59,7 +65,7 @@ def main():
     sg.change_look_and_feel('LightGreen')
     graph = sg.Graph(GRAPH_SIZE, (0, 0), GRAPH_SIZE)
     layout = [[graph]]
-    array = [j for _ in range(1, BARS) for j in range(1, VALUES)]
+    array = [i * VALUES // BARS for i in range(1, BARS)]
     random.shuffle(array)
     window = sg.Window('Sorting Algorithm Visualizer', layout, finalize=True)
     draw(graph, array)
@@ -71,7 +77,7 @@ def main():
     if values[0][0] == "Insertion":
         array_generator = insertion_sort(array)
     elif values[0][0] == "Merge":
-        array_generator = mergesort(array)
+        array_generator = mergesort(array, array, 0)
     else:
         array_generator = quicksort(array)
 
@@ -81,6 +87,7 @@ def main():
             break
         graph.Erase()
         draw(graph, g)
+    sg.Popup("Sorting Done")
     window.close()
 
 

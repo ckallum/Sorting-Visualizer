@@ -2,6 +2,7 @@
   <dictionary name="callum">
     <words>
       <w>mergesort</w>
+      <w>quicksort</w>
     </words>
   </dictionary>
 </component>
