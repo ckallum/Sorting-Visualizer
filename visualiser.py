@@ -45,7 +45,6 @@ def merge(array, left, right, start):
         array[i + j + start] = right[j]
         j += 1
         yield array
-    yield array
 
 
 def merge_sort(array, split, start):
@@ -71,7 +70,7 @@ def partition(array, begin, end, pivot):
 
 def quick_sort_recursion(array, begin, end):
     if begin >= end:
-        yield array
+        return
     pivot = []
     yield from partition(array, begin, end, pivot)
     pivot_idx = pivot.pop()
@@ -101,34 +100,40 @@ def bubble_sort(array):
 def main():
     graph = sg.Graph(GRAPH_SIZE, (0, 0), GRAPH_SIZE)
     layout = [[graph]]
-    array = [i * VALUES // BARS for i in range(1, BARS)]
-    random.shuffle(array)
+
     window = sg.Window('Sorting Algorithm Visualizer', layout, finalize=True)
-    draw(graph, array)
-
-    layout2 = [[sg.T("Choose Algorithm")], [sg.Listbox(["Insertion", "Merge", "Quick", "Bubble"], size=(8, 2))],
-               [sg.OK()]]
-    window2 = sg.Window("Choose Algorithm", layout2)
-    event, values = window2()
-    window2.close()
-    if values[0][0] == "Insertion":
-        array_generator = insertion_sort(array)
-    elif values[0][0] == "Merge":
-        array_generator = merge_sort(array, len(array), 0)
-    elif values[0][0] == "Bubble":
-        array_generator = bubble_sort(array)
-    else:
-        array_generator = quick_sort(array)
-
-    for g in array_generator:
-
+    while 1:
+        array = [i * VALUES // BARS for i in range(1, BARS)]
+        random.shuffle(array)
+        draw(graph, array)
+        layout2 = [[sg.T("Choose Algorithm")], [sg.Listbox(["Insertion", "Merge", "Quick", "Bubble"], size=(8, 4))],
+                   [sg.OK()]]
+        window2 = sg.Window("Choose Algorithm", layout2)
         event, values = window.read(timeout=10)
         if event is None:
             break
-        graph.Erase()
-        draw(graph, g)
-    sg.Popup("Sorting Done")
+        event2, values2 = window2()
+        if not event2:
+            break
+        window2.close()
+        if values2[0][0] == "Insertion":
+            array_generator = insertion_sort(array)
+        elif values2[0][0] == "Merge":
+            array_generator = merge_sort(array, len(array), 0)
+        elif values2[0][0] == "Bubble":
+            array_generator = bubble_sort(array)
+        else:
+            array_generator = quick_sort(array)
+
+        for g in array_generator:
+            event, values = window.read(timeout=10)
+            if event is None:
+                break
+            graph.Erase()
+            draw(graph, g)
+        sg.Popup("Sorting Done")
     window.close()
 
 
-main()
+if __name__ == '__main__':
+    main()
