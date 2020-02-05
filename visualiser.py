@@ -57,8 +57,33 @@ def merge_sort(array, split, start):
     yield array
 
 
-def quick_sort(array):
-    pass
+def partition(array, begin, end, pivot):
+    pivot_idx = begin
+    for i in range(begin + 1, end + 1):
+        if array[i] <= array[begin]:
+            pivot_idx += 1
+            array[i], array[pivot_idx] = array[pivot_idx], array[i]
+            yield array
+    array[pivot_idx], array[begin] = array[begin], array[pivot_idx]
+    pivot.append(pivot_idx)
+    yield array
+
+
+def quick_sort_recursion(array, begin, end):
+    if begin >= end:
+        yield array
+    pivot = []
+    yield from partition(array, begin, end, pivot)
+    pivot_idx = pivot.pop()
+    yield from quick_sort_recursion(array, begin, pivot_idx - 1)
+    yield from quick_sort_recursion(array, pivot_idx + 1, end)
+    yield array
+
+
+def quick_sort(array, begin=0, end=None):
+    if not end:
+        end = len(array) - 1
+    yield from quick_sort_recursion(array, begin, end)
 
 
 def bubble_sort(array):
