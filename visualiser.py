@@ -49,11 +49,11 @@ def merge(array, left, right, start):
 
 
 def mergesort(array, split, start):
-    if len(split) > 1:
-        middle = len(split) // 2
-        yield from mergesort(array, split[:middle], start)
-        yield from mergesort(array, split[middle:], start+middle)
-        yield from merge(array, array[start:start+middle], array[start+middle:start+len(split)], start)
+    if split > 1:
+        middle = (split+1) // 2
+        yield from mergesort(array, middle, start)
+        yield from mergesort(array, middle, start + middle)
+        yield from merge(array, array[start:start + middle], array[start + middle:start + split], start)
     yield array
 
 
@@ -77,7 +77,7 @@ def main():
     if values[0][0] == "Insertion":
         array_generator = insertion_sort(array)
     elif values[0][0] == "Merge":
-        array_generator = mergesort(array, array, 0)
+        array_generator = mergesort(array, len(array), 0)
     else:
         array_generator = quicksort(array)
 
