@@ -48,21 +48,32 @@ def merge(array, left, right, start):
     yield array
 
 
-def mergesort(array, split, start):
+def merge_sort(array, split, start):
     if split > 1:
-        middle = (split+1) // 2
-        yield from mergesort(array, middle, start)
-        yield from mergesort(array, middle, start + middle)
+        middle = (split + 1) // 2
+        yield from merge_sort(array, middle, start)
+        yield from merge_sort(array, middle, start + middle)
         yield from merge(array, array[start:start + middle], array[start + middle:start + split], start)
     yield array
 
 
-def quicksort(array):
+def quick_sort(array):
     pass
 
 
+def bubble_sort(array):
+    def swap(i, j):
+        array[i], array[j] = array[j], array[i]
+
+    for i in range(len(array) - 1):
+        for j in range(i + 1, len(array)):
+            if array[j] < array[i]:
+                swap(i, j)
+                yield array
+    yield array
+
+
 def main():
-    sg.change_look_and_feel('black')
     graph = sg.Graph(GRAPH_SIZE, (0, 0), GRAPH_SIZE)
     layout = [[graph]]
     array = [i * VALUES // BARS for i in range(1, BARS)]
@@ -70,18 +81,22 @@ def main():
     window = sg.Window('Sorting Algorithm Visualizer', layout, finalize=True)
     draw(graph, array)
 
-    layout2 = [[sg.T("Choose Algorithm")], [sg.Listbox(["Insertion", "Merge", "Quick"], size=(8, 2))], [sg.OK()]]
+    layout2 = [[sg.T("Choose Algorithm")], [sg.Listbox(["Insertion", "Merge", "Quick", "Bubble"], size=(8, 2))],
+               [sg.OK()]]
     window2 = sg.Window("Choose Algorithm", layout2)
     event, values = window2()
     window2.close()
     if values[0][0] == "Insertion":
         array_generator = insertion_sort(array)
     elif values[0][0] == "Merge":
-        array_generator = mergesort(array, len(array), 0)
+        array_generator = merge_sort(array, len(array), 0)
+    elif values[0][0] == "Bubble":
+        array_generator = bubble_sort(array)
     else:
-        array_generator = quicksort(array)
+        array_generator = quick_sort(array)
 
     for g in array_generator:
+
         event, values = window.read(timeout=10)
         if event is None:
             break
