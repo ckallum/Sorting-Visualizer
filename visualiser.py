@@ -22,7 +22,7 @@ def insertion_sort(array):
 def draw(graph, array):
     for i, item in enumerate(array):
         graph.draw_rectangle(top_left=(i * BAR_SPACING, item),
-                             bottom_right=(i * BAR_SPACING + BAR_WIDTH, 0), fill_color='#76506d')
+                             bottom_right=(i * BAR_SPACING + BAR_WIDTH, 0), fill_color='snow')
 
 
 def merge(array, left, right, start):
@@ -62,7 +62,7 @@ def quicksort(array):
 
 
 def main():
-    sg.change_look_and_feel('LightGreen')
+    sg.change_look_and_feel('black')
     graph = sg.Graph(GRAPH_SIZE, (0, 0), GRAPH_SIZE)
     layout = [[graph]]
     array = [i * VALUES // BARS for i in range(1, BARS)]
