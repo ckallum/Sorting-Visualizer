@@ -97,6 +97,32 @@ def bubble_sort(array):
     yield array
 
 
+def heapify(array, i, n):
+    current = i
+    left = 2 * i + 1
+    right = 2 * i + 2
+    if left < n and array[left] > array[current]:
+        current = left
+    if right < n and array[right] > array[current]:
+        current = right
+    if current != i:
+        array[i], array[current] = array[current], array[i]
+        yield array
+        yield from heapify(array, current, n)
+    yield array
+
+
+def heap_sort(array):
+    n = len(array)
+    for i in range((n+1)//2, -1, -1):
+        yield from heapify(array, i, n)
+    for i in range(n - 1, 0, -1):
+        array[i], array[0] = array[0], array[i]
+        yield array
+        yield from heapify(array, 0, i)
+    yield array
+
+
 def main():
     graph = sg.Graph(GRAPH_SIZE, (0, 0), GRAPH_SIZE)
     layout = [[graph]]
@@ -106,7 +132,8 @@ def main():
         array = [i * VALUES // BARS for i in range(1, BARS)]
         random.shuffle(array)
         draw(graph, array)
-        layout2 = [[sg.T("Choose Algorithm")], [sg.Listbox(["Insertion", "Merge", "Quick", "Bubble"], size=(8, 4))],
+        layout2 = [[sg.T("Choose Algorithm")],
+                   [sg.Listbox(["Merge", "Quick", "Heap", "Inserstion", "Bubble"], size=(8, 5))],
                    [sg.OK()]]
         window2 = sg.Window("Choose Algorithm", layout2)
         event, values = window.read(timeout=10)
@@ -122,6 +149,8 @@ def main():
             array_generator = merge_sort(array, len(array), 0)
         elif values2[0][0] == "Bubble":
             array_generator = bubble_sort(array)
+        elif values2[0][0] == "Heap":
+            array_generator = heap_sort(array)
         else:
             array_generator = quick_sort(array)
 
